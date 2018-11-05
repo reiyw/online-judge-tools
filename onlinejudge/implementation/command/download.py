@@ -1,10 +1,13 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
 import os
-import colorama
 import sys
+
+import colorama
+
+import onlinejudge
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+
 
 def download(args):
     # prepare values
@@ -13,19 +16,21 @@ def download(args):
         sys.exit(1)
     kwargs = {}
     if args.system:
-        supported_service_names = [ 'aoj', 'yukicoder' ]
+        supported_service_names = ["aoj", "yukicoder"]
         if problem.get_service().get_name() not in supported_service_names:
-            log.error('--system for %s is not supported', problem.get_service().get_name())
+            log.error(
+                "--system for %s is not supported", problem.get_service().get_name()
+            )
             sys.exit(1)
-        kwargs['is_system'] = True
+        kwargs["is_system"] = True
     if args.format is None:
-        if kwargs.get('is_system'):
-            if problem.get_service().get_name() == 'yukicoder':
-                args.format = '%b.%e'
+        if kwargs.get("is_system"):
+            if problem.get_service().get_name() == "yukicoder":
+                args.format = "%b.%e"
             else:
-                args.format = '%i.%e'
+                args.format = "%i.%e"
         else:
-            args.format = 'sample-%i.%e'
+            args.format = "sample-%i.%e"
 
     # get samples from the server
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
@@ -33,29 +38,29 @@ def download(args):
 
     # write samples to files
     for i, sample in enumerate(samples):
-        log.emit('')
-        log.info('sample %d', i)
-        for kind in [ 'input', 'output' ]:
-            ext = kind[: -3]
-            data = sample[kind]['data']
-            name = sample[kind]['name']
+        log.emit("")
+        log.info("sample %d", i)
+        for kind in ["input", "output"]:
+            ext = kind[:-3]
+            data = sample[kind]["data"]
+            name = sample[kind]["name"]
             table = {}
-            table['i'] = str(i+1)
-            table['e'] = ext
-            table['n'] = name
-            table['b'] = os.path.basename(name)
-            table['d'] = os.path.dirname(name)
+            table["i"] = str(i + 1)
+            table["e"] = ext
+            table["n"] = name
+            table["b"] = os.path.basename(name)
+            table["d"] = os.path.dirname(name)
             path = os.path.join(args.directory, utils.parcentformat(args.format, table))
-            log.status('%sput: %s', ext, name)
+            log.status("%sput: %s", ext, name)
             log.emit(colorama.Style.BRIGHT + data.rstrip() + colorama.Style.RESET_ALL)
             if args.dry_run:
                 continue
             if os.path.exists(path):
-                log.warning('file already exists: %s', path)
+                log.warning("file already exists: %s", path)
                 if not args.overwrite:
-                    log.warning('skipped')
+                    log.warning("skipped")
                     continue
             os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, 'w') as fh:
+            with open(path, "w", encoding="utf-8") as fh:
                 fh.write(data)
-            log.success('saved to: %s', path)
+            log.success("saved to: %s", path)

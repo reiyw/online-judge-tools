@@ -1,9 +1,8 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
 import json
 import sys
+
+import onlinejudge
 
 
 def get_standings(args):
@@ -16,12 +15,14 @@ def get_standings(args):
     header, rows = problem.get_standings()
 
     # print it
-    if args.format in [ 'csv', 'tsv' ] :
-        sep = { 'csv': ',', 'tsv': '\t' }[args.format]
+    if args.format in ["csv", "tsv"]:
+        sep = {"csv": ",", "tsv": "\t"}[args.format]
         print(*header, sep=sep)
         for row in rows:
-            print(*[ row[col] if row[col] is not None else '' for col in header ], sep=sep)
-    elif args.format == 'json':
+            print(
+                *[row[col] if row[col] is not None else "" for col in header], sep=sep
+            )
+    elif args.format == "json":
         print(json.dumps(rows))
     else:
         assert False
